@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './index.module.scss';
+import CountDown from 'components/CountDown';
 
 interface IProps {
   isShow: boolean;
@@ -8,6 +9,8 @@ interface IProps {
 
 const Login = (props: IProps) => {
   const { isShow = false, onClose } = props;
+  // 验证码展示的设置
+  const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
   const [form, setForm] = useState({
     // 手机号
     phone: '',
@@ -23,6 +26,19 @@ const Login = (props: IProps) => {
 
   const handleOAuthGithub = () => {};
 
+  // 表单的提交
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const handleCountDownEnd = () => {
+    setIsShowVerifyCode(false);
+  };
+
   return isShow ? (
     <div className={styles.loginArea}>
       <div className={styles.loginBox}>
@@ -37,6 +53,7 @@ const Login = (props: IProps) => {
           type="text"
           placeholder="请输入手机号"
           value={form.phone}
+          onChange={handleFormChange}
         />
         <div className={styles.verifyCodeArea}>
           <input
@@ -44,10 +61,15 @@ const Login = (props: IProps) => {
             type="text"
             placeholder="请输入验证码"
             value={form.verify}
+            onChange={handleFormChange}
           />
           {/* 获取验证码的点击函数 */}
           <span className={styles.verifyCode} onClick={handleGetVerifyCode}>
-            获取验证码
+            {isShowVerifyCode ? (
+              <CountDown time={10} onEnd={handleCountDownEnd} />
+            ) : (
+              '获取验证码'
+            )}
           </span>
         </div>
         <div className={styles.loginBtn} onClick={handleLogin}>
@@ -63,7 +85,7 @@ const Login = (props: IProps) => {
             target="_blank"
             rel="noreferrer"
           >
-            《隐私协议》
+            用户协议
           </a>
         </div>
       </div>
