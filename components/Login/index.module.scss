@@ -9,7 +9,7 @@
   
     .loginBox {
       width: 320px;
-      height: 320px;
+      height: 400px;
       background-color: #fff;
       position: relative;
       top: 50%;
@@ -43,7 +43,24 @@
           font-size: 14px;
         }
       }
+
     }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-weight: bold;
+  }
+
+  .tabTitle {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .login-form-button {
+    width: 100%;
+  }
   
     .loginTitle {
       font-size: 20px;
@@ -53,10 +70,7 @@
       align-items: center;
       margin-bottom: 20px;
   
-      .close {
-        color: #888;
-        cursor: pointer;
-      }
+
     }
   
     .loginBtn {

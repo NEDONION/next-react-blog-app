@@ -16,6 +16,6 @@
     "incremental": true,
     "baseUrl": "." // 修改引入的根路径，需要重启
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "setupProxy.js"],
   "exclude": ["node_modules"]
 }

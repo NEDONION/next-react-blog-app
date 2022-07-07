@@ -1,93 +1,219 @@
 import { useState } from 'react';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { message, Tabs, Button, Form, Input } from 'antd';
 import styles from './index.module.scss';
-import CountDown from 'components/CountDown';
+import { validUserName, validPass, validEmail } from 'utils/valid';
+import api from 'service/index';
+import { error } from 'console';
 
 interface IProps {
   isShow: boolean;
   onClose: Function;
 }
 
+const { TabPane } = Tabs;
+
 const Login = (props: IProps) => {
   const { isShow = false, onClose } = props;
-  // 验证码展示的设置
-  const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
-  const [form, setForm] = useState({
-    // 手机号
-    phone: '',
-    // 验证码
-    verify: '',
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: '',
   });
 
-  const handleClose = () => {};
+  const [registerForm, setRegisterForm] = useState({
+    username: '',
+    name: '',
+    email: '',
+    password: '',
+    comfirmPassword: '',
+  });
 
-  const handleGetVerifyCode = () => {};
+  const handleClose = () => {
+    // 点击关闭窗口
+    onClose && onClose();
+  };
 
-  const handleLogin = () => {};
+  const handleLogin = () => {
+    api
+      .signin({
+        accountOrEmail: loginForm.username,
+        password: loginForm.password,
+      })
+      .then((res: any) => {
+        if (res?.status === 200) {
+          message.success('登录成功');
+          onClose && onClose();
+        } else {
+          message.error(res?.statusText);
+        }
+      });
+  };
+
+  // 提交注册
+  const handleRegister = () => {
+    // 前端校验
+    if (!validUserName(registerForm.username)) {
+      message.error('请输入正确的用户名');
+      return false;
+    } else if (!validPass(registerForm.password)) {
+      message.error('密码应为6到20位字母或数字');
+      return false;
+    } else if (!validPass(registerForm.comfirmPassword)) {
+      message.error('确认密码有误');
+      return false;
+    } else if (registerForm.comfirmPassword !== registerForm.password) {
+      message.error('两次密码不一致');
+      return false;
+    } else if (!registerForm.email || !validEmail(registerForm.email)) {
+      message.error('请输入正确的邮箱');
+      return false;
+    } else if (!registerForm.name) {
+      message.error('请输入昵称');
+      return false;
+    }
+
+    // 提交注册请求
+    api
+      .register({
+        account: registerForm.username,
+        name: registerForm.name,
+        email: registerForm.email,
+        password: registerForm.password,
+      })
+      .then((res: any) => {
+        if (res?.status === 201) {
+          message.success('注册成功');
+          onClose && onClose();
+        } else {
+          message.error(res?.statusText || '未知错误');
+        }
+      });
+  };
 
   const handleOAuthGithub = () => {};
 
-  // 表单的提交
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 登录表单的提交
+  const handleLoginFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm({
-      ...form,
+    setLoginForm({
+      ...loginForm,
       [name]: value,
     });
   };
 
-  const handleCountDownEnd = () => {
-    setIsShowVerifyCode(false);
+  // 注册表单的提交
+  const handleRegisterFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterForm({
+      ...registerForm,
+      [name]: value,
+    });
+  };
+
+  const onChange = (key: string) => {
+    console.log(key);
+  };
+
+  const onFinish = (values: any) => {
+    console.log('Success:', values);
   };
 
   return isShow ? (
     <div className={styles.loginArea}>
       <div className={styles.loginBox}>
-        <div className={styles.loginTitle}>
-          <div>手机号登录</div>
-          <div className={styles.close} onClick={handleClose}>
-            x
-          </div>
-        </div>
-        <input
-          name="phone"
-          type="text"
-          placeholder="请输入手机号"
-          value={form.phone}
-          onChange={handleFormChange}
-        />
-        <div className={styles.verifyCodeArea}>
-          <input
-            name="verify"
-            type="text"
-            placeholder="请输入验证码"
-            value={form.verify}
-            onChange={handleFormChange}
-          />
-          {/* 获取验证码的点击函数 */}
-          <span className={styles.verifyCode} onClick={handleGetVerifyCode}>
-            {isShowVerifyCode ? (
-              <CountDown time={10} onEnd={handleCountDownEnd} />
-            ) : (
-              '获取验证码'
-            )}
-          </span>
-        </div>
-        <div className={styles.loginBtn} onClick={handleLogin}>
-          登录
-        </div>
-        <div className={styles.otherLogin} onClick={handleOAuthGithub}>
-          GitHub 登录
-        </div>
-        <div className={styles.loginPrivacy}>
-          注册登录即表示同意
-          <a
-            href="https://moco.imooc.com/privacy.html"
-            target="_blank"
-            rel="noreferrer"
-          >
-            用户协议
-          </a>
-        </div>
+        <button className={styles.close} onClick={handleClose}>
+          x
+        </button>
+        {/* 登录注册tabs页 居中 */}
+        <Tabs
+          defaultActiveKey="1"
+          centered={true}
+          tabBarStyle={{ fontWeight: 'bold' }}
+          onChange={onChange}
+        >
+          <TabPane tab="注册" key="1">
+            <input
+              name="username"
+              type="text"
+              placeholder="请输入用户名"
+              value={registerForm.username}
+              onChange={handleRegisterFormChange}
+            />
+            <input
+              name="name"
+              type="text"
+              placeholder="请输入昵称"
+              value={registerForm.name}
+              onChange={handleRegisterFormChange}
+            />
+            <input
+              name="email"
+              type="text"
+              placeholder="请输入邮箱"
+              value={registerForm.email}
+              onChange={handleRegisterFormChange}
+            />
+            <div className={styles.verifyCodeArea}>
+              <input
+                name="password"
+                type="text"
+                placeholder="请输入密码"
+                value={registerForm.password}
+                onChange={handleRegisterFormChange}
+              />
+            </div>
+            <div className={styles.verifyCodeArea}>
+              <input
+                name="comfirmPassword"
+                type="text"
+                placeholder="请再次输入密码"
+                value={registerForm.comfirmPassword}
+                onChange={handleRegisterFormChange}
+              />
+            </div>
+
+            <div className={styles.loginBtn} onClick={handleRegister}>
+              注册
+            </div>
+          </TabPane>
+          <TabPane tab="登录" key="2">
+            <input
+              name="username"
+              type="text"
+              placeholder="请输入用户名或邮箱"
+              value={loginForm.username}
+              onChange={handleLoginFormChange}
+            />
+            <div className={styles.verifyCodeArea}>
+              <input
+                name="password"
+                type="text"
+                placeholder="请输入密码"
+                value={loginForm.password}
+                onChange={handleLoginFormChange}
+              />
+            </div>
+            <div className={styles.loginBtn} onClick={handleLogin}>
+              登录
+            </div>
+            <div className={styles.otherLogin} onClick={handleOAuthGithub}>
+              GitHub 登录
+            </div>
+            <div className={styles.otherLogin} onClick={handleOAuthGithub}>
+              还没有账号？注册新账号
+            </div>
+            <div className={styles.loginPrivacy}>
+              注册登录即表示同意
+              <a
+                href="https://moco.imooc.com/privacy.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                用户协议
+              </a>
+            </div>
+          </TabPane>
+        </Tabs>
       </div>
     </div>
   ) : null;
