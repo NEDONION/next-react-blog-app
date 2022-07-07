@@ -7,11 +7,11 @@ export function validEmail(val: string): boolean  {
   }
   
   export function validPass(val: string): boolean {
-    return /^[a-zA-Z\d]{8,20}$/.test(val);
+    return /^[a-zA-Z\d]{6,20}$/.test(val);
 
   }
   
-  export function validUserName(name: string): boolean {
+  export function validEmailorPhone(name: string): boolean {
     return validEmail(name) || validPhone(name);
   }
   
@@ -19,7 +19,7 @@ export function validEmail(val: string): boolean  {
     return /^[0-9]{6}$/.test(val);
   }
   
-  export function userName(str: string): boolean {
+  export function validUserName(str: string): boolean {
     const re = /^[\u4E00-\u9FA5A-Za-z0-9]+$/
     return re.test(str);
   }
@@ -60,10 +60,10 @@ export function validEmail(val: string): boolean  {
   export default {
     validEmail,
     validPhone,
-    validUserName,
+    validEmailorPhone,
     validCode,
     validPass,
-    userName,
+    validUserName,
     validateMainName2,
     validateNickName,
     formatDate

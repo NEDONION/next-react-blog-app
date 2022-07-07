@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { message, Tabs, Button, Tooltip } from 'antd';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { message, Tabs, Button, Form, Input } from 'antd';
 import styles from './index.module.scss';
+import { validUserName, validPass, validEmail } from 'utils/valid';
+import api from 'service/index';
+import { error } from 'console';
 
 interface IProps {
   isShow: boolean;
@@ -11,8 +15,6 @@ const { TabPane } = Tabs;
 
 const Login = (props: IProps) => {
   const { isShow = false, onClose } = props;
-  // 验证码展示的设置
-  const [isShowVerifyCode, setIsShowVerifyCode] = useState(false);
   const [loginForm, setLoginForm] = useState({
     username: '',
     password: '',
@@ -20,6 +22,8 @@ const Login = (props: IProps) => {
 
   const [registerForm, setRegisterForm] = useState({
     username: '',
+    name: '',
+    email: '',
     password: '',
     comfirmPassword: '',
   });
@@ -29,11 +33,62 @@ const Login = (props: IProps) => {
     onClose && onClose();
   };
 
-  const handleGetVerifyCode = () => {};
+  const handleLogin = () => {
+    api
+      .signin({
+        accountOrEmail: loginForm.username,
+        password: loginForm.password,
+      })
+      .then((res: any) => {
+        if (res?.status === 200) {
+          message.success('登录成功');
+          onClose && onClose();
+        } else {
+          message.error(res?.statusText);
+        }
+      });
+  };
 
-  const handleLogin = () => {};
+  // 提交注册
+  const handleRegister = () => {
+    // 前端校验
+    if (!validUserName(registerForm.username)) {
+      message.error('请输入正确的用户名');
+      return false;
+    } else if (!validPass(registerForm.password)) {
+      message.error('密码应为6到20位字母或数字');
+      return false;
+    } else if (!validPass(registerForm.comfirmPassword)) {
+      message.error('确认密码有误');
+      return false;
+    } else if (registerForm.comfirmPassword !== registerForm.password) {
+      message.error('两次密码不一致');
+      return false;
+    } else if (!registerForm.email || !validEmail(registerForm.email)) {
+      message.error('请输入正确的邮箱');
+      return false;
+    } else if (!registerForm.name) {
+      message.error('请输入昵称');
+      return false;
+    }
 
-  const handleRegister = () => {};
+    // 提交注册请求
+    api
+      .register({
+        account: registerForm.username,
+        name: registerForm.name,
+        email: registerForm.email,
+        password: registerForm.password,
+      })
+      .then((res: any) => {
+        if (res?.status === 201) {
+          message.success('注册成功');
+          onClose && onClose();
+        } else {
+          message.error(res?.statusText || '未知错误');
+        }
+      });
+  };
 
   const handleOAuthGithub = () => {};
 
@@ -55,12 +110,12 @@ const Login = (props: IProps) => {
     });
   };
 
-  const handleCountDownEnd = () => {
-    setIsShowVerifyCode(false);
-  };
-
   const onChange = (key: string) => {
     console.log(key);
+  };
+
+  const onFinish = (values: any) => {
+    console.log('Success:', values);
   };
 
   return isShow ? (
@@ -82,6 +137,20 @@ const Login = (props: IProps) => {
               type="text"
               placeholder="请输入用户名"
               value={registerForm.username}
+              onChange={handleRegisterFormChange}
+            />
+            <input
+              name="name"
+              type="text"
+              placeholder="请输入昵称"
+              value={registerForm.name}
+              onChange={handleRegisterFormChange}
+            />
+            <input
+              name="email"
+              type="text"
+              placeholder="请输入邮箱"
+              value={registerForm.email}
               onChange={handleRegisterFormChange}
             />
             <div className={styles.verifyCodeArea}>
@@ -111,7 +180,7 @@ const Login = (props: IProps) => {
             <input
               name="username"
               type="text"
-              placeholder="请输入用户名"
+              placeholder="请输入用户名或邮箱"
               value={loginForm.username}
               onChange={handleLoginFormChange}
             />
