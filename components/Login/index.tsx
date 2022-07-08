@@ -4,7 +4,6 @@ import { message, Tabs, Button, Form, Input } from 'antd';
 import styles from './index.module.scss';
 import { validUserName, validPass, validEmail } from 'utils/valid';
 import api from 'service/index';
-import { error } from 'console';
 
 interface IProps {
   isShow: boolean;
@@ -15,6 +14,7 @@ const { TabPane } = Tabs;
 
 const Login = (props: IProps) => {
   const { isShow = false, onClose } = props;
+  const [tabKey, setTabKey] = useState('1');
   const [loginForm, setLoginForm] = useState({
     username: '',
     password: '',
@@ -111,27 +111,66 @@ const Login = (props: IProps) => {
   };
 
   const onChange = (key: string) => {
-    console.log(key);
+    setTabKey(key); //点击切换
   };
 
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
+  // 切换到注册的Tab
+  const handleToRegister = () => {
+    onChange('2');
   };
 
   return isShow ? (
     <div className={styles.loginArea}>
       <div className={styles.loginBox}>
-        <button className={styles.close} onClick={handleClose}>
+        <i className={styles.close} onClick={handleClose}>
           x
-        </button>
+        </i>
         {/* 登录注册tabs页 居中 */}
         <Tabs
-          defaultActiveKey="1"
+          // defaultActiveKey={tabKey}
+          activeKey={tabKey}
           centered={true}
           tabBarStyle={{ fontWeight: 'bold' }}
           onChange={onChange}
         >
-          <TabPane tab="注册" key="1">
+          <TabPane tab="登录" key="1">
+            <input
+              name="username"
+              type="text"
+              placeholder="请输入用户名或邮箱"
+              value={loginForm.username}
+              onChange={handleLoginFormChange}
+            />
+            <div className={styles.verifyCodeArea}>
+              <input
+                name="password"
+                type="text"
+                placeholder="请输入密码"
+                value={loginForm.password}
+                onChange={handleLoginFormChange}
+              />
+            </div>
+            <div className={styles.loginBtn} onClick={handleLogin}>
+              登录
+            </div>
+            <div className={styles.otherLogin} onClick={handleOAuthGithub}>
+              GitHub 登录
+            </div>
+            <div className={styles.otherLogin} onClick={handleToRegister}>
+              还没有账号？注册新账号
+            </div>
+            <div className={styles.loginPrivacy}>
+              注册登录即表示同意
+              <a
+                href="https://moco.imooc.com/privacy.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                用户协议
+              </a>
+            </div>
+          </TabPane>
+          <TabPane tab="注册" key="2">
             <input
               name="username"
               type="text"
@@ -174,43 +213,6 @@ const Login = (props: IProps) => {
 
             <div className={styles.loginBtn} onClick={handleRegister}>
               注册
-            </div>
-          </TabPane>
-          <TabPane tab="登录" key="2">
-            <input
-              name="username"
-              type="text"
-              placeholder="请输入用户名或邮箱"
-              value={loginForm.username}
-              onChange={handleLoginFormChange}
-            />
-            <div className={styles.verifyCodeArea}>
-              <input
-                name="password"
-                type="text"
-                placeholder="请输入密码"
-                value={loginForm.password}
-                onChange={handleLoginFormChange}
-              />
-            </div>
-            <div className={styles.loginBtn} onClick={handleLogin}>
-              登录
-            </div>
-            <div className={styles.otherLogin} onClick={handleOAuthGithub}>
-              GitHub 登录
-            </div>
-            <div className={styles.otherLogin} onClick={handleOAuthGithub}>
-              还没有账号？注册新账号
-            </div>
-            <div className={styles.loginPrivacy}>
-              注册登录即表示同意
-              <a
-                href="https://moco.imooc.com/privacy.html"
-                target="_blank"
-                rel="noreferrer"
-              >
-                用户协议
-              </a>
             </div>
           </TabPane>
         </Tabs>

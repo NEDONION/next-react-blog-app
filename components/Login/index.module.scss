@@ -47,10 +47,15 @@
     }
 
     .close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      float: right;
+      cursor: pointer;
+      opacity: .4;
       font-weight: bold;
+      font-size: large;
+  }
+  // 悬浮加阴影提示可点击
+  .close:hover {
+      opacity: 1;
   }
 
   .tabTitle {
