@@ -3,8 +3,9 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { message, Tabs, Button, Form, Input } from 'antd';
 import styles from './index.module.scss';
 import { validUserName, validPass, validEmail } from 'utils/valid';
-import api from 'service/index';
+import { LoginApi, RegisterApi } from 'service/api';
 
+// 从父组件传递过来的props
 interface IProps {
   isShow: boolean;
   onClose: Function;
@@ -34,19 +35,26 @@ const Login = (props: IProps) => {
   };
 
   const handleLogin = () => {
-    api
-      .signin({
-        accountOrEmail: loginForm.username,
-        password: loginForm.password,
-      })
-      .then((res: any) => {
-        if (res?.status === 200) {
-          message.success('登录成功');
-          onClose && onClose();
-        } else {
-          message.error(res?.statusText);
-        }
-      });
+    LoginApi({
+      accountOrEmail: loginForm.username,
+      password: loginForm.password,
+    }).then(async (res: any) => {
+      if (res?.status === 200) {
+        const userInfo = {
+          userId: loginForm.username,
+          token: res.data.accessToken,
+        };
+        // 登录成功，保存用户数据
+        // 保存用户信息进入 localStorage
+        localStorage.setItem('userId', userInfo.userId);
+        localStorage.setItem('token', userInfo.token);
+
+        message.success('登录成功');
+        onClose && onClose();
+      } else {
+        message.error(res?.statusText || '登录失败');
+      }
+    });
   };
 
   // 提交注册
@@ -73,21 +81,20 @@ const Login = (props: IProps) => {
     }
 
     // 提交注册请求
-    api
-      .register({
-        account: registerForm.username,
-        name: registerForm.name,
-        email: registerForm.email,
-        password: registerForm.password,
-      })
-      .then((res: any) => {
-        if (res?.status === 201) {
-          message.success('注册成功');
-          onClose && onClose();
-        } else {
-          message.error(res?.statusText || '未知错误');
-        }
-      });
+    RegisterApi({
+      account: registerForm.username,
+      name: registerForm.name,
+      email: registerForm.email,
+      password: registerForm.password,
+    }).then((res: any) => {
+      if (res?.status === 201) {
+        message.success('注册成功');
+        onChange('1'); // 切换到登录 Tab
+        // onClose && onClose();
+      } else {
+        message.error(res?.statusText || '未知错误');
+      }
+    });
   };
 
   const handleOAuthGithub = () => {};
@@ -127,29 +134,30 @@ const Login = (props: IProps) => {
         </i>
         {/* 登录注册tabs页 居中 */}
         <Tabs
-          // defaultActiveKey={tabKey}
+          // defaultActiveKey="1"
           activeKey={tabKey}
           centered={true}
+          size="large"
           tabBarStyle={{ fontWeight: 'bold' }}
           onChange={onChange}
         >
           <TabPane tab="登录" key="1">
-            <input
+            <Input
               name="username"
               type="text"
               placeholder="请输入用户名或邮箱"
               value={loginForm.username}
               onChange={handleLoginFormChange}
             />
-            <div className={styles.verifyCodeArea}>
-              <input
-                name="password"
-                type="text"
-                placeholder="请输入密码"
-                value={loginForm.password}
-                onChange={handleLoginFormChange}
-              />
-            </div>
+            <Input.Password
+              name="password"
+              type="text"
+              placeholder="请输入密码"
+              bordered={false}
+              visibilityToggle={false}
+              value={loginForm.password}
+              onChange={handleLoginFormChange}
+            />
             <div className={styles.loginBtn} onClick={handleLogin}>
               登录
             </div>
@@ -160,7 +168,7 @@ const Login = (props: IProps) => {
               还没有账号？注册新账号
             </div>
             <div className={styles.loginPrivacy}>
-              注册登录即表示同意
+              注册登录即表示同意 <></>
               <a
                 href="https://moco.imooc.com/privacy.html"
                 target="_blank"
@@ -171,45 +179,45 @@ const Login = (props: IProps) => {
             </div>
           </TabPane>
           <TabPane tab="注册" key="2">
-            <input
+            <Input
               name="username"
               type="text"
               placeholder="请输入用户名"
               value={registerForm.username}
               onChange={handleRegisterFormChange}
             />
-            <input
+            <Input
               name="name"
               type="text"
               placeholder="请输入昵称"
               value={registerForm.name}
               onChange={handleRegisterFormChange}
             />
-            <input
+            <Input
               name="email"
               type="text"
               placeholder="请输入邮箱"
               value={registerForm.email}
               onChange={handleRegisterFormChange}
             />
-            <div className={styles.verifyCodeArea}>
-              <input
-                name="password"
-                type="text"
-                placeholder="请输入密码"
-                value={registerForm.password}
-                onChange={handleRegisterFormChange}
-              />
-            </div>
-            <div className={styles.verifyCodeArea}>
-              <input
-                name="comfirmPassword"
-                type="text"
-                placeholder="请再次输入密码"
-                value={registerForm.comfirmPassword}
-                onChange={handleRegisterFormChange}
-              />
-            </div>
+            <Input.Password
+              placeholder="请输入密码"
+              name="password"
+              type="text"
+              bordered={false}
+              visibilityToggle={false}
+              value={registerForm.password}
+              onChange={handleRegisterFormChange}
+            />
+            <Input.Password
+              name="comfirmPassword"
+              type="text"
+              placeholder="请再次输入密码"
+              bordered={false}
+              visibilityToggle={false}
+              value={registerForm.comfirmPassword}
+              onChange={handleRegisterFormChange}
+            />
 
             <div className={styles.loginBtn} onClick={handleRegister}>
               注册

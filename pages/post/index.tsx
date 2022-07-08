@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { Avatar, List, Space, message, Skeleton } from 'antd';
 import React from 'react';
-import api from 'service';
+import { GetAllPostsApi } from 'service/api';
 
 const Post: NextPage = () => {
   const [initLoading, setInitLoading] = useState(true);
@@ -16,25 +16,28 @@ const Post: NextPage = () => {
       href: '',
     },
   ]);
+
   // 最后[]的表示没有依赖项，页面只在首次加载
   useEffect(() => {
     // 异步写法
-    const fetchData = async () => {
-      const result = await api.getAllPosts();
-      setData(result.data.content);
-      setInitLoading(false);
-    };
-    fetchData();
+    // const fetchData = async () => {
+    //   const result = await api.getAllPosts();
+    //   setData(result.data.content);
+    //   setInitLoading(false);
+    // };
+    // fetchData();
 
     // 同步写法
-    // api.getAllPosts().then((res?: any) => {
-    //   if (res?.status == 200) {
-    //     setData(res.data.content);
-    //     setInitLoading(false);
-    //   } else {
-    //     message.error(res?.statusText);
-    //   }
-    // });
+    GetAllPostsApi().then((res?: any) => {
+      if (res?.status == 200) {
+        setData(res.data.content);
+        setInitLoading(false);
+      } else {
+        // 打印promise的错误信息
+
+        message.error(res?.message);
+      }
+    });
   }, []);
 
   const IconText = ({ icon, text }: { icon: React.FC, text: string }) => (
