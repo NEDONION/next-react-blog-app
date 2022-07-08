@@ -21,7 +21,7 @@
   - MySQL
   - JPA
   
-## Todo
+## To do
 - Posts 发帖
 - Like 点赞
 - Comment 评论
