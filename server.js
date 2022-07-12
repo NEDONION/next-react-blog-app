@@ -5,7 +5,8 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const devProxy = {
   '/api': {
-    target: 'http://localhost:8088',
+    target: 'http://Myblog-env.eba-zqvydgyq.us-east-2.elasticbeanstalk.com',
+    // target: 'http://localhost:8088',
     changeOrigin: true,
     secure: true,
   },
