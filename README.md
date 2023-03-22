@@ -1,29 +1,15 @@
-## Intro 介绍
-> 类小红书的社区app，包含基本功能
+# Learn a CRUD web application based on Next.js
 
-- 登录注册
-- 发帖
-- 点赞
+- Authorization and Authentication
+- Post new posts
 - ...
 
-## Techstack 技术栈
-### Front End
+## Requisites
 - React
 - Next.js
 - Ant Design
 - TypeScript
 - scss
 
-### Back End
-  - Java
-  - Spring Boot
-  - Spring Security
-  - MySQL
-  - JPA
-  
-## To do
-- Posts 发帖
-- Like 点赞
-- Comment 评论
-- User homepage 用户主页
-- ...
+## Reference
+TODO
